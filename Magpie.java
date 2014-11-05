@@ -45,7 +45,15 @@ public class Magpie
     else if (statement.indexOf("Landgraf") >= 0
                || statement.indexOf("Kiang") >= 0)
     {
-      response = "Oh, that's an awesome name. I bet that guy is awesome";
+      response = "Oh, wow. He sounds like a really good teacher";
+    }
+    else if (statement.indexOf("cat") >= 0
+            || statement.indexOf("dog") >= 0
+            || statement.indexOf("iguana") >= 0
+            || statement.indexOf("mouse") >= 0
+            || statement.indexOf("rabbit") >= 0)
+    {
+      response = "Tell me more about your pets";
     }
     else
     {
