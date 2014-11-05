@@ -49,16 +49,30 @@ public class Magpie
       response = "Oh, wow. He sounds like a really good teacher";
     }
     else if (statement.indexOf("cat") >= 0
-            || statement.indexOf("dog") >= 0
-            || statement.indexOf("iguana") >= 0
-            || statement.indexOf("mouse") >= 0
-            || statement.indexOf("rabbit") >= 0)
+               || statement.indexOf("dog") >= 0
+               || statement.indexOf("iguana") >= 0
+               || statement.indexOf("mouse") >= 0
+               || statement.indexOf("rabbit") >= 0)
     {
       response = "Tell me more about your pets";
     }
     else if (statement.length() <= 0)
     {
       response = "Say something, please";
+    }
+    else if (statement.indexOf("overwhelm") >= 0
+             || statement.indexOf("stress") >= 0)
+    {
+      response = "Do you want to talk about it?";
+    }
+    else if (statement.indexOf("weight") >= 0
+             || statement.indexOf("lift") >= 0)
+    {
+      response = "Yeah, lifting is good for you. You should totally do it";
+    }
+    else if (statement.indexOf("dragon") >= 0)
+    {
+      response = "YEEEEESSSSS! I love dragons!";
     }
     else
     {
