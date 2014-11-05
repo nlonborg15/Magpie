@@ -120,3 +120,12 @@ public class Magpie
     return response;
   }
 }
+
+/* Priortization in this program works based on the tree of else if statements.
+ * The program tries to find a keyword from the list above in the statement, and if it can't then
+ * it moves down a tier. It should respond with the response it has for "no" if the statement "My  
+ * mother has a dog but no cat” since there is a "no" in their statement and "no" is the first if statement
+ * in the respond method. The program will also respond to words that have the sections which are identical to
+ * keywords. That means the program will respond to a sentence with "know" in it as though it were responsing
+ * to a sentence with "no" since it just looks for the keyword and responds accordingly*/
+
