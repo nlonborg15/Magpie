@@ -53,6 +53,10 @@ public class Magpie
     {
       response = "Why so negative?";
     }
+    else if (findKeyword(statement, "said", 0) >= 0)
+    {
+      response = transformSaidStatement(statement);//early on so that it will preempt the others
+    }
     else if (findKeyword(statement, "mother") >= 0
                || findKeyword(statement, "father") >= 0
                || findKeyword(statement, "sister") >= 0
@@ -110,6 +114,15 @@ public class Magpie
     else if (findKeyword(statement, "are", 0) >= 0)
     {
       response = transformAreStatement(statement);
+    }
+    else if (findKeyword(statement, "was", 0) >= 0
+               || findKeyword(statement, "were", 0) >= 0)
+    {
+      response = transformWasWereStatement(statement);
+    }
+    else if (findKeyword(statement, "had", 0) >= 0)
+    {
+      response = transformHadStatement(statement);
     }
     else
     {
@@ -225,6 +238,47 @@ public class Magpie
    -if keyword "you" followed by "are"
    ¥start with "why am I"
    ¥end with rest of statement
+   
+   I threw the ball to you.
+   -if keyword
+   -final: Why did you throw the ball to me
+   
+   I have been waiting, Obi-Wan.
+   -
+   -final: Why have you been waiting
+   
+   I was hoping we would meet.
+   -If keyword "I" or "he" or "she" and "was"
+   ¥start with "Why were you"
+   ¥end with rest of phrase (after "was")
+   -if keywords "you" or "we" or "they" and "were"
+   ¥start with "Why were you"
+   ¥end with rest of phrase (after "were")
+   -final: Why were you hoping we would meet
+   
+   We had not read the books.
+   -keyword "had"
+   ¥Start with "Why had"
+   ¥Next put section before "had"--doesn't work with things starting with "said"
+   ¥Finish with section after "had"
+   -final: Why had you not read the books
+   
+   I worked hard
+   -
+   -final: Why did you work hard
+   
+   I said you are intelligent
+   -keyword "said"
+   ¥Start with "why d0"
+   ¥next put noun of who is saying + "say"
+   ¥next put who is recieving
+   ¥correctly conjugated "to be"
+   ¥rest of statement after "to be"
+   -final: Why did you say I am intelligent
+   
+   I tallied the results.
+   -
+   -final: Why did you tally the results
    */
   
   private String transformAreStatement (String statement)
@@ -239,7 +293,7 @@ public class Magpie
     
     int psn = findKeyword (statement, "are", 0);
     
-     String restOfStatement = statement.substring(psn + 3, statement.length()).trim();
+    String restOfStatement = statement.substring(psn + 3, statement.length()).trim();
     
     if (findKeyword (statement, "we", 0) >= 0)
     {
@@ -255,7 +309,7 @@ public class Magpie
     }
   }
   
-   private String transformIAmStatement (String statement)
+  private String transformIAmStatement (String statement)
   {
     statement = statement.trim();
     String lastChar = statement.substring(statement.length() - 1);
@@ -269,8 +323,8 @@ public class Magpie
     String restOfStatement = statement.substring(psn + 2, statement.length()).trim();
     return "Why are you " + restOfStatement + "?";
   }
-   
-    private String transformIsStatement (String statement)
+  
+  private String transformIsStatement (String statement)
   {
     statement = statement.trim();
     String lastChar = statement.substring(statement.length() - 1);
@@ -285,12 +339,148 @@ public class Magpie
     String restOfStatement = statement.substring(psn + 2, statement.length()).trim();
     return "Why is " + beforeIsStatement + " " + restOfStatement;
   }
+  private String transformWasWereStatement (String statement)
+  {
+    statement = statement.trim();
+    String lastChar = statement.substring(statement.length() - 1);
+    if (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length() - 1);
+    }
+    
+    
+    if (findKeyword(statement, "was", 0) >= 0)
+    {
+      int psn = findKeyword (statement, "was", 0);
+      String restOfStatement = statement.substring(psn + 3, statement.length()).trim();
+      String beginningOfStatement = statement.substring(0, psn).toLowerCase().trim();
+      if (findKeyword(statement, "I", 0) >= 0)
+      {
+        return "Why were you " + restOfStatement + "?";
+      }
+      else 
+      {
+        return "Why was " + beginningOfStatement + " " + restOfStatement + "?";
+      }
+    }
+    else
+    {
+      int psn = findKeyword (statement, "were", 0);
+      String restOfStatement = statement.substring(psn + 4, statement.length()).trim();
+      String beginningOfStatement = statement.substring(0, psn).toLowerCase().trim();
+      return "Why were " + beginningOfStatement + " " + restOfStatement + "?";
+    }
+    
+  }
+  private String transformHadStatement (String statement)
+  {
+    statement = statement.trim();
+    String lastChar = statement.substring(statement.length() - 1);
+    if (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length() - 1);
+    }
+    
+    int psn = findKeyword (statement, "had", 0);
+    String restOfStatement = statement.substring(psn + 3, statement.length()).trim();
+    String beginningOfStatement = statement.substring(0, psn).toLowerCase().trim();
+    return "Why had " + beginningOfStatement + " " + restOfStatement + "?";
+    
+  }
+  private String transformSaidStatement (String statement)//changes said statement
+  {
+    statement = statement.trim();
+    String lastChar = statement.substring(statement.length() - 1);
+    if (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length() - 1);
+    }
+    
+    int psn = findKeyword (statement, "said", 0);
+    int psn2;
+    if (findKeyword(statement, "am", 0) >= 0)
+    {
+      psn2 = findKeyword (statement, "am", 0) + 2;
+    }
+    else if (findKeyword(statement, "are", 0) >= 0)
+    {
+      psn2 = findKeyword (statement, "are", 0) + 3;
+    }
+    else if (findKeyword(statement, "is", 0) >= 0)
+    {
+      psn2 = findKeyword(statement, "is", 0) + 2;
+    }
+    else
+    {
+      psn2 = 0;
+    }
+    String section1 = statement.substring(0, psn);
+    String section2 = statement.substring(psn, statement.length());
+    String restOfStatement = statement.substring(psn2, statement.length()).trim();
+    return "Why do " + getPronoun(section1) + " say " + getPronoun(section2) + " " + getToBe(statement) + " " + restOfStatement + "?";
+  }
+  
+  
   
   private String getRandomResponse ()
   {
     Random r = new Random ();
     return randomResponses [r.nextInt(randomResponses.length)];
   }
+  
+  private String getPronoun (String statement) //meant to be able to switch pronouns
+  {
+    if (findKeyword(statement, pronouns [0][0], 0) >= 0)
+    {
+      return pronouns[0][1];
+    }
+    else if (findKeyword(statement, pronouns [0][1], 0) >= 0)
+    {
+      return pronouns[0][0];
+    }
+    else if (findKeyword(statement, pronouns [1][0], 0) >= 0)
+    {
+      return pronouns[1][1];
+    }
+    else
+    {
+      return pronouns[1][1];
+    }
+  }
+  private String [] [] pronouns = 
+  { {"I", "you"},
+    {"We", "you"} };
+  
+  private String getToBe(String statement)
+  {
+    if (findKeyword(statement, toBe [0][0], 0) >= 0)
+    {
+      return toBe[0][1];
+    }
+    else if (findKeyword(statement, toBe [1][0], 0) >= 0
+               ||findKeyword(statement, toBe [4][0], 0) >= 0
+               ||findKeyword(statement, toBe [5][0], 0) >= 0)
+    {
+      return pronouns[1][1];
+    }
+    else if (findKeyword(statement, toBe [2][0], 0) >= 0
+               ||findKeyword(statement, toBe [3][0], 0) >= 0)
+    {
+      return toBe[2][1];
+    }
+    else
+    {
+      return pronouns[1][1];
+    }
+  }
+  
+  private String [] [] toBe =
+  { {"I", "am"},
+    {"you", "are"},
+    {"he", "is"},
+    {"she"},
+    {"we"},
+    {"they"} };
   
   private String [] randomResponses = 
   {
@@ -304,4 +494,6 @@ public class Magpie
     "I'm a little confused"
   };
 }
+
+
 
