@@ -1,3 +1,4 @@
+import java.util.Random;
 
 public class Magpie
 {
@@ -98,6 +99,18 @@ public class Magpie
     {
       response = transformIWantStatement(statement);
     }
+    else if (findKeyword(statement, "is", 0) >= 0)
+    {
+      response = transformIsStatement(statement);
+    }
+    else if (findKeyword(statement, "am", 0) >= 0)
+    {
+      response = transformIAmStatement(statement);
+    }
+    else if (findKeyword(statement, "are", 0) >= 0)
+    {
+      response = transformAreStatement(statement);
+    }
     else
     {
       // Look for a two word (you <something> me)
@@ -186,48 +199,109 @@ public class Magpie
   {
     return findKeyword(statement, goal, 0);
   }
+  /*
+   IsStatement: --doesn't work if not a simple statement. ex: he said this is best doesn't work
+   -if keyword "is"
+   •put " why is" in front
+   •next put section before "is"
+   •follow with rest of statement
+   
+   IAmStatement
+   -if keyword "am"
+   •put "why are you" in front
+   •follow with rest of statement
+   
+   AreStatement
+   -if keyword "are" with nouns before it
+   •put "why are they" in front
+   •next put subjects (nouns)--don't know how i would do this
+   •end with rest of statement
+   -if keyword "they" followed by "are"
+   •put "why are they" in front
+   •end with rest of statement
+   -if keyword "we" followed by "are"
+   •start with "why are you"
+   •end with rest of statement
+   -if keyword "you" followed by "are"
+   •start with "why am I"
+   •end with rest of statement
+   */
   
-  private String getRandomResponse()
+  private String transformAreStatement (String statement)
   {
-    final int NUMBER_OF_RESPONSES = 6;
-    double r = Math.random();
-    int whichResponse = (int)(r * NUMBER_OF_RESPONSES);
-    String response = "";
-    
-    if (whichResponse == 0)
+    statement = statement.trim();
+    String lastChar = statement.substring(statement.length() - 1);
+    if (lastChar.equals("."))
     {
-      response = "Interesting, tell me more.";
-    }
-    else if (whichResponse == 1)
-    {
-      response = "Hmmm.";
-    }
-    else if (whichResponse == 2)
-    {
-      response = "Do you really think so?";
-    }
-    else if (whichResponse == 3)
-    {
-      response = "You don't say.";
-    }
-    else if (whichResponse == 4)
-    {
-      response = "I'm not sure I understand";
-    }
-    else if (whichResponse == 5)
-    {
-      response = "Could you explain a little more?";
+      statement = statement.substring(0, statement.length() - 1);
     }
     
-    return response;
+    
+    int psn = findKeyword (statement, "are", 0);
+    
+     String restOfStatement = statement.substring(psn + 3, statement.length()).trim();
+    
+    if (findKeyword (statement, "we", 0) >= 0)
+    {
+      return "Why are you " + restOfStatement + "?";
+    }
+    else if (findKeyword (statement, "you", 0) >= 0)
+    {
+      return "Why am I " + restOfStatement + "?";
+    }
+    else
+    {
+      return "Why are they " + restOfStatement + "?";
+    }
   }
+  
+   private String transformIAmStatement (String statement)
+  {
+    statement = statement.trim();
+    String lastChar = statement.substring(statement.length() - 1);
+    if (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length() - 1);
+    }
+    
+    int psn = findKeyword (statement, "am", 0);
+    
+    String restOfStatement = statement.substring(psn + 2, statement.length()).trim();
+    return "Why are you " + restOfStatement + "?";
+  }
+   
+    private String transformIsStatement (String statement)
+  {
+    statement = statement.trim();
+    String lastChar = statement.substring(statement.length() - 1);
+    if (lastChar.equals("."))
+    {
+      statement = statement.substring(0, statement.length() - 1);
+    }
+    
+    int psn = findKeyword (statement, "is", 0);
+    
+    String beforeIsStatement = statement.substring(0, psn).trim();
+    String restOfStatement = statement.substring(psn + 2, statement.length()).trim();
+    return "Why is " + beforeIsStatement + " " + restOfStatement;
+  }
+  
+  private String getRandomResponse ()
+  {
+    Random r = new Random ();
+    return randomResponses [r.nextInt(randomResponses.length)];
+  }
+  
+  private String [] randomResponses = 
+  {
+    "Interesting, tell me more",
+    "Hmmm.",
+    "Do you really think so?",
+    "You don't say.",
+    "Could you explain a little more?",
+    "I'm not sure I understand",
+    "...I don't even know what to say to that",
+    "I'm a little confused"
+  };
 }
-
-/* Priortization in this program works based on the tree of else if statements.
- * The program tries to find a keyword from the list above in the statement, and if it can't then
- * it moves down a tier. It should respond with the response it has for "no" if the statement "My  
- * mother has a dog but no cat” since there is a "no" in their statement and "no" is the first if statement
- * in the respond method. The program will also respond to words that have the sections which are identical to
- * keywords. That means the program will respond to a sentence with "know" in it as though it were responsing
- * to a sentence with "no" since it just looks for the keyword and responds accordingly*/
 
